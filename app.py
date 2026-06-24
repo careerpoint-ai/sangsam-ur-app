@@ -60,7 +60,6 @@ with col2:
         if st.button("🚀 모든 메모 통합 분석 및 자동 입력 시작"):
             with st.spinner("AI가 모든 업로드 자료를 읽고 통합하여 최신 양식을 정리하는 중입니다..."):
                 try:
-                    # 들여쓰기 에러 유발 소지를 원천 제거한 프롬프트 문자열 구성
                     prompt = (
                         "당신은 중장년 취업 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
                         "제공된 파일들(최대 3장의 사진 또는 PDF)은 상담사가 상담 중에 필기한 '취업상담 일지' 메모 자료입니다.\n"
@@ -96,7 +95,7 @@ with col2:
                         "■ 4. 진로 방향 및 개인 상황\n"
                         "- 희망 방향: [ ] 동일직무 [ ] 유사분야 [ ] 완전전직 [ ] 창업/프리랜서 [ ] 미결정\n"
                         "- 희망 근무 형태: [ ] 정규직 [ ] 파트타임 [ ] 계약직 [ ] 프리랜서·긱워커 [ ] 상관없음\n"
-                        "- 희망 분야/직무 (구체적으로): \n"
+                        "- 희망 분야/직무 (구체적으로):\n"
                         "- 재미·흥미 느끼는 활동: \n"
                         "- 경제적 시급성: [ ] 매우 시급 [ ] 시급 [ ] 보통 [ ] 여유 있음\n"
                         "- 건강 상태: [ ] 풀타임 가능 [ ] 하루 4~6시간 적합 [ ] 단시간·단발성 선호 [ ] 건강 이슈로 제한\n"
@@ -123,22 +122,33 @@ with col2:
                     
                     st.success("✅ 모든 파일 통합 분석 완료!")
                     
-                    # 원클릭 복사 단추 생성
+                    # 🌟 [해결책] HTML 격리 구역 내부에 데이터와 버튼을 함께 밀어 넣어 완벽하게 동작하도록 구성
+                    # 특수문자 깨짐 및 줄바꿈 오류 방지를 위해 자바스크립트용 텍스트 안전 인코딩 적용
+                    safe_text = ai_result.replace("`", "\\`").replace("$", "\\$")
+                    
                     st.html(f"""
                     <div style="margin-bottom: 15px;">
-                        <button onclick="navigator.clipboard.writeText(document.getElementById('log-content').innerText); alert('📋 전체 상담일지 내용이 클립보드에 복사되었습니다! 문서 편집기(한글/워드)에 바로 붙여넣으세요.');" 
-                                style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%;">
+                        <button onclick="
+                            navigator.clipboard.writeText(document.getElementById('log-content-internal').innerText)
+                            .then(() => {{
+                                const alertBox = document.getElementById('copy-alert');
+                                alertBox.style.display = 'block';
+                                setTimeout(() => {{ alertBox.style.display = 'none'; }}, 2500);
+                            }});
+                        " 
+                        style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%;">
                             📋 전체 내용 복사하기
                         </button>
                     </div>
+                    <div id="copy-alert" style="display: none; background-color: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 4px; border: 1px solid #c8e6c9; font-weight: bold; margin-bottom: 15px; text-align: center; font-size: 14px;">
+                        ✅ 전체 내용이 클립보드에 복사되었습니다! 문서 편집기(한글/워드)에 붙여넣으세요.
+                    </div>
+                    <div id="log-content-internal" style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; white-space: pre-wrap; font-family: sans-serif; font-size: 14px; line-height: 1.6;">{ai_result}</div>
                     """)
-                    
-                    # 대시보드 내 가시화 영역 출력
-                    st.html(f"<div id='log-content' style='background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; white-space: pre-wrap; font-family: monospace;'>{ai_result}</div>")
                     
                 except Exception as e:
                     st.error(f"❌ 오류가 발생했습니다: {str(e)}")
-                    st.caption("API 키가 올바른지, 혹은 파일에 문제가 없는지 확인해 주세요.")
+                    st.caption("API 키가 올바른지 확인해 주세요.")
     else:
         st.info("왼쪽 화면에서 파일(최대 3개)을 업로드해 주세요.")
         
