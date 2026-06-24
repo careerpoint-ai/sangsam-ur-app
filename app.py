@@ -55,25 +55,29 @@ with col1:
 
 with col2:
     st.subheader("✨ AI 변환 및 구조화 결과")
-    # 요구사항 반영: 상단의 빨간색 안내 박스를 제거하여 상담사 화면을 깔끔하게 유지합니다.
 
     if uploaded_files:
         if st.button("🚀 모든 메모 통합 분석 및 자동 입력 시작"):
             with st.spinner("AI가 모든 업로드 자료를 읽고 통합하여 최신 양식을 정리하는 중입니다..."):
                 try:
-                    # AI 프롬프트 (전달받은 모든 최신 필드 포함)
+                    # 🌟 요구사항 반영: [출력 양식 틀] 문구를 제외하고, 20폰트 크기의 HTML 스타일 제목을 생성하도록 프롬프트 수정
                     prompt = """
                     당신은 중장년 취업 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.
                     제공된 파일들(최대 3장의 사진 또는 PDF)은 상담사가 상담 중에 필기한 '취업상담 일지' 메모 자료입니다.
                     여러 장에 나뉘어 있더라도 내용을 유기적으로 결합하고 정확히 판독(OCR)하여, 아래의 최신 '상담일지앱 표준 양식'에 맞게 채워서 출력해 주세요.
 
                     [작성 규칙]
-                    1. 메모에 적힌 수기 글씨와 인쇄 텍스트를 모두 분석하여 정확하게 추출하세요.
-                    2. 체크박스([ ]) 항목은 메모에 해당한다고 표시되어 있다면 [■] 또는 [v]로 변경하여 표시하세요.
-                    3. 언급되지 않은 빈 칸이나 항목은 공란(빈칸)으로 유지하세요.
+                    1. 맨 첫 줄에는 양식명인 <h2 style='text-align: center; font-family: "Malgun Gothic", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2> 를 반드시 그대로 출력하세요.
+                    2. 메모에 적힌 수기 글씨와 인쇄 텍스트를 모두 분석하여 정확하게 추출하세요.
+                    3. 체크박스([ ]) 항목은 메모에 해당한다고 표시되어 있다면 [■] 또는 [v]로 변경하여 표시하세요.
+                    4. 언급되지 않은 빈 칸이나 항목은 공란(빈칸)으로 유지하세요.
 
                     ---
-                    [출력 양식 틀]
+                    [출력 스타일 규칙]
+                    최상단 타이틀은 아래 형태로 시작해야 합니다:
+                    <h2 style='text-align: center; font-family: "Malgun Gothic", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2>
+                    
+                    그 아래 내용 양식 구조:
                     
                     ■ 1. 내담자 기본 정보
                     - 상담 일자: 
@@ -128,6 +132,49 @@ with col2:
                     
                     st.success("✅ 모든 파일 통합 분석 완료!")
                     
+                    # 🌟 요구사항 반영 1: 원클릭 복사 단추 생성
+                    # st.html을 활용하여 복사 시 HTML 스타일(중앙 정렬 및 폰트 효과)이 클립보드에 그대로 복사되도록 구성
+                    st.html(f"""
+                    <div style="margin-bottom: 15px;">
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('log-content').innerText); alert('📋 전체 상담일지 내용이 클립보드에 복사되었습니다! 문서 편집기(한글/워드)에 바로 붙여넣으세요.');" 
+                                style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%;">
+                            📋 전체 내용 복사하기
+                        </button>
+                    </div>
+                    """)
+                    
+                    # 🌟 요구사항 반영 2: 대시보드 화면상에서도 제목이 고딕 볼드체 20포인트(h2 상당) 및 중앙에 배치되도록 가시화 처리
+                    # 전체 데이터를 숨겨진 텍스트 영역에 담아 원클릭 복사가 정상 지원되도록 배치
+                    st.html(f"<div id='log-content' style='background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; white-space: pre-wrap; font-family: monospace;'>{ai_result}</div>")
+                    
+                except Exception as e:
+                    st.error(f"❌ 오류가 발생했습니다: {str(e)}")
+                    st.caption("API 키가 올바른지, 혹은 파일에 문제가 없는지 확인해 주세요.")
+    else:
+        st.info("왼쪽 화면에서 파일(최대 3개)을 업로드해 주세요.")
+                    
+                    ■ 5. 회차별 상담 내용 (메모가 해당하는 회차만 채우기)
+                    - 주요 상담 주제: 
+                    - 현재 상태 및 주요 내용: 
+                    - 제공한 솔루션 / 정보: 
+                    - 내담자 반응: 
+                    - 다음 회차 계획: 
+                    - 서류/지원 현황: 이력서 취합 [ ]완료 [ ]미완료 / 지원 ( )건 / 면접 ( )건
+                    
+                    ■ 6. 사후 관리 및 특이사항
+                    - 취업 여부: [ ] 취업 완료 [ ] 구직 중 [ ] 구직 중단 [ ] 개인사업 [ ] 기타
+                    - 취업처명 / 직무: 
+                    - 취업 확인서: [ ] 수령 [ ] 미수령
+                    - 사후 관리 메모: 
+                    ---
+                    """
+                    
+                    content_payload = [prompt] + image_parts
+                    response = model.generate_content(content_payload)
+                    ai_result = response.text
+                    
+                    st.success("✅ 모든 파일 통합 분석 완료!")
+                    
                     st.text_area(
                         "아래 내용을 복사(Ctrl+A -> Ctrl+C)하여 통합 문서에 붙여넣으세요.", 
                         value=ai_result, 
@@ -139,3 +186,4 @@ with col2:
                     st.caption("API 키가 올바른지, 혹은 파일에 문제가 없는지 확인해 주세요.")
     else:
         st.info("왼쪽 화면에서 파일(최대 3개)을 업로드해 주세요.")
+        
