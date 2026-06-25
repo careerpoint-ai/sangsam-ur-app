@@ -9,7 +9,7 @@ st.title("📝 세컨드라이프팀 취업상담 일지 AI 입력기")
 st.markdown("수기 메모한 상담 일지 사진(최대 3장)이나 PDF를 올리면, AI가 내용을 통합 분석하여 표준 양식에 맞게 변환해 줍니다.")
 st.markdown("---")
 
-# 2. [원복] API 키 설정 (Secrets 자동 연동)
+# 2. API 키 설정 (Secrets 자동 연동 원복 상태 유지)
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
 
 if GOOGLE_API_KEY == "YOUR_GEMINI_API_KEY_HERE":
@@ -60,7 +60,7 @@ with col2:
         if st.button("🚀 모든 메모 통합 분석 및 자동 입력 시작"):
             with st.spinner("AI가 모든 업로드 자료를 읽고 통합하여 최신 양식을 정리하는 중입니다..."):
                 try:
-                    # 안정적인 추출을 위한 표준 프롬프트
+                    # 안정적인 추출을 위한 표준 프롬프트 (수정 없음)
                     prompt = (
                         "당신은 중장년 취업 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
                         "제공된 파일들(최대 3장의 사진 또는 PDF)은 상담사가 상담 중에 필기한 '취업상담 일지' 메모 자료입니다.\n"
@@ -119,17 +119,39 @@ with col2:
                     
                     st.success("✅ 모든 파일 통합 분석 완료!")
                     
-                    # 요구사항 반영: 추출 파일 최상단에 큰 제목을 강제 결합
+                    # 제목 자동 결합 구조 유지
                     final_document = f"[취업 상담 일지]\n\n{ai_result.strip()}"
                     
-                    # 1. 화면 중앙에 고딕 볼드체 20폰트 상당(h2)으로 대제목 시각화 제공
+                    # 1. 화면 중앙 대제목 시각화 유지
                     st.markdown("<h2 style='text-align: center; font-family: \"Malgun Gothic\", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2>", unsafe_allow_html=True)
                     
-                    # 2. 429 무한 루프 에러를 완벽 차단하는 원클릭 복사 컴포넌트 출력
+                    # 2. 🌟 [부활] 무한루프가 발생하지 않는 안전한 초록색 원클릭 복사 버튼 생성
+                    st.html("""
+                        <style>
+                            /* 스트림릿 기본 헬퍼 버튼 스타일을 공용 초록색 테마로 커스텀 변경 */
+                            .stClipboard button {
+                                background-color: #2e7d32 !important;
+                                color: white !important;
+                                font-weight: bold !important;
+                                padding: 12px 24px !important;
+                                border-radius: 6px !important;
+                                width: 100% !important;
+                                font-size: 15px !important;
+                                border: none !important;
+                                cursor: pointer !important;
+                            }
+                            .stClipboard button:hover {
+                                background-color: #1b5e20 !important;
+                            }
+                        </style>
+                    """)
+                    st.clipboard_button(label="📋 전체 내용 복사하기", data=final_document)
+                    
+                    # 3. 데이터 시각화용 텍스트 에어리어 박스
                     st.text_area(
-                        label="📋 아래 상자 내부 주황색 테두리 혹은 우측 상단의 [문서 모양 복사 아이콘]을 클릭하면 전체 내용이 복사됩니다.",
+                        label="📄 변환된 데이터 내용 상세 보기",
                         value=final_document,
-                        height=550
+                        height=500
                     )
                     
                 except Exception as e:
