@@ -119,19 +119,13 @@ with col2:
                     
                     st.success("✅ 모든 파일 통합 분석 완료!")
                     
-                    # 제목 강제 결합
                     final_document = f"[취업 상담 일지]\n\n{ai_result.strip()}"
                     
                     # 1. 화면 중앙 대제목 시각화 유지
                     st.markdown("<h2 style='text-align: center; font-family: \"Malgun Gothic\", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2>", unsafe_allow_html=True)
                     
-                    # 2. 🌟 [정석] 복사 오류를 완벽히 해결하는 가이드 문구와 순정 대용량 상자 구성
-                    st.info("💡 아래 상자 안쪽을 클릭 후 [Ctrl + A] (전체선택) ➡️ [Ctrl + C] (복사) 하시면 한글/워드에 바로 붙여넣을 수 있습니다.")
-                    st.text_area(
-                        label="📄 복사용 데이터 상자 (클릭 후 Ctrl+A ➡️ Ctrl+C)",
-                        value=final_document,
-                        height=550
-                    )
+                    # 2. 🌟 [해결] 마우스를 올리지 않아도 우측 상단에 [Copy] 아이콘이 강제 노출되는 순정 컴포넌트 적용
+                    st.code(final_document, language="text", wrap_lines=True)
                     
                 except Exception as e:
                     st.error(f"❌ 오류가 발생했습니다: {str(e)}")
