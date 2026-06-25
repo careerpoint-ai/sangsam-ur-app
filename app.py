@@ -62,7 +62,7 @@ with col2:
                 try:
                     # 표준 프롬프트 구조 (변경 없음)
                     prompt = (
-                        "당신은 중장년 취 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
+                        "당신은 중장년 취업 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
                         "제공된 파일들(최대 3장의 사진 또는 PDF)은 상담사가 상담 중에 필기한 '취업상담 일지' 메모 자료입니다.\n"
                         "여러 장에 나뉘어 있더라도 내용을 유기적으로 결합하고 정확히 판독(OCR)하여, 아래의 최신 '상담일지앱 표준 양식'에 맞게 채워서 출력해 주세요.\n\n"
                         "[작성 규칙]\n"
@@ -119,46 +119,18 @@ with col2:
                     
                     st.success("✅ 모든 파일 통합 분석 완료!")
                     
+                    # 제목 강제 결합
                     final_document = f"[취업 상담 일지]\n\n{ai_result.strip()}"
                     
-                    # 1. 화면 중앙 대제목 시각화
+                    # 1. 화면 중앙 대제목 시각화 유지
                     st.markdown("<h2 style='text-align: center; font-family: \"Malgun Gothic\", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2>", unsafe_allow_html=True)
                     
-                    # 2. 🌟 [보안 우회] 어떤 브라우저 제약이든 무조건 100% 강제 복사하는 HTML/JS 구조 적용
-                    st.html(f"""
-                    <div style="margin-bottom: 12px;">
-                        <textarea id="copy-target-area" style="position: absolute; top: -9999px; left: -9999px;">{final_document}</textarea>
-                        <button onclick="
-                            try {{
-                                var textArea = document.getElementById('copy-target-area');
-                                textArea.style.display = 'block';
-                                textArea.select();
-                                textArea.setSelectionRange(0, 99999);
-                                document.execCommand('copy');
-                                
-                                var btn = document.getElementById('real-copy-btn');
-                                btn.innerText = '✅ 복사 완료!';
-                                btn.style.backgroundColor = '#1b5e20';
-                                setTimeout(function() {{
-                                    btn.innerText = '📋 전체 내용 복사하기';
-                                    btn.style.backgroundColor = '#2e7d32';
-                                }}, 2000);
-                            }} catch (e) {{
-                                alert('복사 중 오류가 발생했습니다. 하단 상자 내용을 직접 드래그해 주세요.');
-                            }}
-                        " 
-                        id="real-copy-btn"
-                        style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s;">
-                            📋 전체 내용 복사하기
-                        </button>
-                    </div>
-                    """)
-                    
-                    # 3. 데이터 가시화용 텍스트 상자
+                    # 2. 🌟 [정석] 복사 오류를 완벽히 해결하는 가이드 문구와 순정 대용량 상자 구성
+                    st.info("💡 아래 상자 안쪽을 클릭 후 [Ctrl + A] (전체선택) ➡️ [Ctrl + C] (복사) 하시면 한글/워드에 바로 붙여넣을 수 있습니다.")
                     st.text_area(
-                        label="📄 변환된 데이터 내용 상세 보기",
+                        label="📄 복사용 데이터 상자 (클릭 후 Ctrl+A ➡️ Ctrl+C)",
                         value=final_document,
-                        height=500
+                        height=550
                     )
                     
                 except Exception as e:
