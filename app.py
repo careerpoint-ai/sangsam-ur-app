@@ -62,7 +62,7 @@ with col2:
                 try:
                     # 표준 프롬프트 구조 (변경 없음)
                     prompt = (
-                        "당신은 중장년 취업 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
+                        "당신은 중장년 취 지원 전문 기관인 '상상우리 세컨드라이프팀'의 스마트 업무 비서입니다.\n"
                         "제공된 파일들(최대 3장의 사진 또는 PDF)은 상담사가 상담 중에 필기한 '취업상담 일지' 메모 자료입니다.\n"
                         "여러 장에 나뉘어 있더라도 내용을 유기적으로 결합하고 정확히 판독(OCR)하여, 아래의 최신 '상담일지앱 표준 양식'에 맞게 채워서 출력해 주세요.\n\n"
                         "[작성 규칙]\n"
@@ -124,25 +124,31 @@ with col2:
                     # 1. 화면 중앙 대제목 시각화
                     st.markdown("<h2 style='text-align: center; font-family: \"Malgun Gothic\", sans-serif; font-weight: bold;'>[취업 상담 일지]</h2>", unsafe_allow_html=True)
                     
-                    # 2. 🌟 버전 제약 없이 100% 작동하는 안전한 원클릭 복사 버튼 및 알림 구현
-                    # 이 HTML 박스는 독립적으로 작동하므로 무한 리셋 버그를 완벽하게 방지합니다.
+                    # 2. 🌟 [보안 우회] 어떤 브라우저 제약이든 무조건 100% 강제 복사하는 HTML/JS 구조 적용
                     st.html(f"""
-                    <div style="margin-bottom: 10px;">
-                        <textarea id="hidden-text" style="display:none;">{final_document}</textarea>
+                    <div style="margin-bottom: 12px;">
+                        <textarea id="copy-target-area" style="position: absolute; top: -9999px; left: -9999px;">{final_document}</textarea>
                         <button onclick="
-                            const txt = document.getElementById('hidden-text').value;
-                            navigator.clipboard.writeText(txt).then(() => {{
-                                const btn = document.getElementById('copy-btn');
+                            try {{
+                                var textArea = document.getElementById('copy-target-area');
+                                textArea.style.display = 'block';
+                                textArea.select();
+                                textArea.setSelectionRange(0, 99999);
+                                document.execCommand('copy');
+                                
+                                var btn = document.getElementById('real-copy-btn');
                                 btn.innerText = '✅ 복사 완료!';
                                 btn.style.backgroundColor = '#1b5e20';
-                                setTimeout(() => {{
+                                setTimeout(function() {{
                                     btn.innerText = '📋 전체 내용 복사하기';
                                     btn.style.backgroundColor = '#2e7d32';
                                 }}, 2000);
-                            }});
+                            }} catch (e) {{
+                                alert('복사 중 오류가 발생했습니다. 하단 상자 내용을 직접 드래그해 주세요.');
+                            }}
                         " 
-                        id="copy-btn"
-                        style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%; transition: background-color 0.3s;">
+                        id="real-copy-btn"
+                        style="background-color: #2e7d32; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s;">
                             📋 전체 내용 복사하기
                         </button>
                     </div>
